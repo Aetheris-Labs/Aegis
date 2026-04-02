@@ -35,3 +35,4 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
   CMD curl -f http://localhost:8000/api/v1/heartbeat || exit 1
 
 CMD ["node", "dist/main.js"]
+
