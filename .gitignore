@@ -47,5 +47,6 @@ coverage/
 # Chroma vector DB data
 chroma-data/
 
+
 # Bun
 bun.lockb
