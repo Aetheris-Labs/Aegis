@@ -81,3 +81,4 @@ Ineffective patterns (< 30% success rate over 10+ instances) are pruned automati
 | Max positions | 3 per strategy |
 | Human approval | Required > $500 |
 | Circuit breaker | 3 losses in 1h → 4h cooldown |
+
