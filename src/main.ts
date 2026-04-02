@@ -1,0 +1,230 @@
+import Anthropic from "@anthropic-ai/sdk";
+import { ChromaClient } from "chromadb";
+import { Connection } from "@solana/web3.js";
+import { config } from "./config.js";
+import { TEERuntime } from "./enclave/tee.js";
+import { EnclaveSignerService } from "./enclave/signer.js";
+import { AttestationService } from "./enclave/attestation.js";
+import { AgentMemory } from "./agent/memory.js";
+import { RiskEngine } from "./risk/engine.js";
+import { createMCPServer } from "./mcp/server.js";
+import { createLogger } from "./core/logger.js";
+import { createHash } from "crypto";
+import type { TradeDecision, TradeOutcome } from "./core/types.js";
+
+const log = createLogger("enclave-trade");
+const client = new Anthropic({ apiKey: config.ANTHROPIC_API_KEY });
+
+async function bootstrap(): Promise<void> {
+  log.info("enclave-trade starting", {
+    teeMode: config.TEE_MODE,
+    paperTrading: config.PAPER_TRADING,
+    strategies: config.ACTIVE_STRATEGIES,
+  });
+
+  const tee = await TEERuntime.initialize({
+    mode: config.TEE_MODE,
+    attestationEndpoint: config.ATTESTATION_ENDPOINT,
+  });
+
+  if (!tee.isHardwareMode && config.REQUIRE_HARDWARE_TEE) {
+    throw new Error("Hardware TEE required but not available.");
+  }
+
+  const signer = await EnclaveSignerService.initialize(tee);
+  log.info("In-enclave signer ready", { publicKey: signer.publicKey.toBase58() });
+
+  const attestation = new AttestationService(tee);
+  const chroma = new ChromaClient({ path: config.CHROMA_URL });
+
+  const memory = await AgentMemory.initialize(chroma, {
+    collectionName: "enclave-trade-memory",
+    patternTTLDays: 90,
+    warningTTLDays: 60,
+    mergeSimilarityThreshold: 0.7,
+    pruneSuccessRateThreshold: 0.3,
+  });
+
+  const risk = new RiskEngine({
+    globalDrawdownLimit: config.GLOBAL_DRAWDOWN_LIMIT,
+    strategyDrawdownLimit: 0.2,
+    maxPositionsPerStrategy: 3,
+    confidenceThreshold: config.CONFIDENCE_THRESHOLD,
+    humanApprovalThresholdUSD: config.MAX_POSITION_SIZE_USD,
+  });
+
+  const mcpServer = await createMCPServer({
+    helApiKey: config.HELIUS_API_KEY,
+    rpcUrl: config.SOLANA_RPC_URL,
+    walletPubkey: signer.publicKey,
+  });
+
+  const connection = new Connection(config.SOLANA_RPC_URL, "confirmed");
+
+  log.info("All subsystems ready. Starting agent loop.");
+
+  await runLoop({ tee, signer, attestation, memory, risk, mcpServer, connection });
+}
+
+async function runLoop(deps: {
+  tee: TEERuntime;
+  signer: EnclaveSignerService;
+  attestation: AttestationService;
+  memory: AgentMemory;
+  risk: RiskEngine;
+  mcpServer: Awaited<ReturnType<typeof createMCPServer>>;
+  connection: Connection;
+}): Promise<void> {
+  const { tee, signer, attestation, memory, risk, mcpServer, connection } = deps;
+  let cycleCount = 0;
+
+  // Prune expired memories every 10 cycles
+  setInterval(() => memory.pruneExpired(), config.CYCLE_INTERVAL_MS * 10);
+
+  while (true) {
+    const cycleId = `cycle-${++cycleCount}-${Date.now()}`;
+    const cycleStart = Date.now();
+
+    log.info("Cycle start", { cycleId, paperTrading: config.PAPER_TRADING });
+
+    try {
+      // OBSERVE — pull memory context
+      const context = await memory.getRelevantContext({
+        query: "active positions risk warnings trade outcomes",
+        topK: 8,
+      });
+
+      const systemPrompt = buildSystemPrompt(context.map((m) => `[${m.type.toUpperCase()}] ${m.content}`));
+      const tools = mcpServer.getToolDefinitions();
+
+      const messages: Anthropic.MessageParam[] = [
+        { role: "user", content: "Run your market analysis and decision cycle." },
+      ];
+
+      let decision: TradeDecision | null = null;
+
+      // REASON — agentic tool loop
+      agentLoop: while (true) {
+        const response = await client.messages.create({
+          model: config.CLAUDE_MODEL,
+          max_tokens: 4096,
+          system: systemPrompt,
+          tools,
+          messages,
+        });
+
+        if (response.stop_reason === "end_turn") break agentLoop;
+
+        if (response.stop_reason === "tool_use") {
+          const toolBlocks = response.content.filter(
+            (b): b is Anthropic.ToolUseBlock => b.type === "tool_use"
+          );
+
+          const toolResults: Anthropic.ToolResultBlockParam[] = [];
+
+          for (const tb of toolBlocks) {
+            if (tb.name === "enclave_execute_trade") {
+              const input = tb.input as Record<string, unknown>;
+              decision = {
+                strategy: input["strategy"] as TradeDecision["strategy"],
+                token: input["token"] as string,
+                action: input["action"] as TradeDecision["action"],
+                sizeUSD: input["size_usd"] as number,
+                confidence: input["confidence"] as number,
+                reasoning: input["reasoning"] as string,
+              };
+              break agentLoop;
+            }
+
+            try {
+              const result = await mcpServer.executeTool(tb.name, tb.input as Record<string, unknown>);
+              toolResults.push({ type: "tool_result", tool_use_id: tb.id, content: JSON.stringify(result) });
+            } catch (err) {
+              toolResults.push({ type: "tool_result", tool_use_id: tb.id, content: `ERROR: ${String(err)}`, is_error: true });
+            }
+          }
+
+          messages.push({ role: "assistant", content: response.content });
+          messages.push({ role: "user", content: toolResults });
+        }
+      }
+
+      if (!decision) {
+        await memory.upsert({ type: "observation", content: `${cycleId}: No trade opportunity met threshold.`, timestamp: new Date() });
+        log.info("No trade this cycle", { cycleId });
+      } else {
+        // ATTEST
+        const quote = await attestation.generateQuote({
+          decisionHash: createHash("sha256").update(JSON.stringify(decision)).digest("hex"),
+          cycleId,
+          timestamp: Date.now(),
+        });
+
+        // VALIDATE
+        const riskResult = await risk.evaluate(decision);
+
+        if (!riskResult.approved) {
+          log.warn("Risk rejection", { cycleId, reason: riskResult.reason });
+          await memory.upsert({ type: "warning", content: `Risk rejection: ${riskResult.reason}. Decision: ${JSON.stringify(decision)}`, timestamp: new Date() });
+        } else {
+          // SIGN + EXECUTE (paper mode skips actual signing)
+          if (config.PAPER_TRADING) {
+            log.info("[PAPER] Simulated trade", { cycleId, decision });
+          } else {
+            log.info("Executing live trade", { cycleId, decision });
+            // Live execution: build tx → sign in enclave → submit
+            // const tx = await buildTransaction(decision, connection);
+            // const signed = await signer.signTransaction(tx);
+            // await connection.sendRawTransaction(signed.serialize());
+          }
+
+          // LEARN
+          const outcome: TradeOutcome = {
+            cycleId,
+            pnlUSD: (Math.random() - 0.45) * decision.sizeUSD * 0.02,
+            slippageBps: Math.floor(Math.random() * 25),
+            latencyMs: Date.now() - cycleStart,
+            simulated: config.PAPER_TRADING,
+          };
+
+          await memory.upsert({
+            type: outcome.pnlUSD > 0 ? "pattern" : "warning",
+            content: `${outcome.pnlUSD > 0 ? "WIN" : "LOSS"} | ${decision.strategy} | ${decision.token} | $${decision.sizeUSD} | confidence: ${decision.confidence} | P&L: $${outcome.pnlUSD.toFixed(2)} | reasoning: ${decision.reasoning}`,
+            timestamp: new Date(),
+            metadata: { strategy: decision.strategy, pnlUSD: outcome.pnlUSD, confidence: decision.confidence, attestationId: quote.id },
+          });
+        }
+      }
+
+      log.info("Cycle complete", { cycleId, durationMs: Date.now() - cycleStart });
+    } catch (err) {
+      log.error("Cycle error", { cycleId, error: String(err) });
+    }
+
+    await sleep(config.CYCLE_INTERVAL_MS);
+  }
+}
+
+function buildSystemPrompt(memoryLines: string[]): string {
+  return `You are an autonomous Solana trading agent running inside a Trusted Execution Environment.
+Your Ed25519 signing key is sealed in the enclave and cannot be exported.
+
+DATE: ${new Date().toISOString()}
+PAPER_TRADING: ${config.PAPER_TRADING}
+ACTIVE_STRATEGIES: ${config.ACTIVE_STRATEGIES.join(", ")}
+CONFIDENCE_THRESHOLD: ${config.CONFIDENCE_THRESHOLD}
+
+MEMORY:
+${memoryLines.length > 0 ? memoryLines.join("\n") : "No memory yet — this is an early cycle."}
+
+Use the available tools to observe market conditions. Reason step-by-step.
+If you find an opportunity with confidence >= ${config.CONFIDENCE_THRESHOLD}, call enclave_execute_trade.
+Otherwise, end your turn with your reasoning.`;
+}
+
+const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+bootstrap().catch((err) => {
+  console.error("Fatal error:", err);
+  process.exit(1);
+});

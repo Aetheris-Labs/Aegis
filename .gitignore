@@ -1,0 +1,51 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Build outputs
+dist/
+*.tsbuildinfo
+
+# Environment — NEVER commit real keys
+.env
+.env.local
+.env.production
+
+# Database
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+
+# TEE sealed key material — NEVER commit
+*.sealed
+sealed-key.bin
+enclave-key.*
+tee-measurement.json
+
+# Logs & audit trails
+logs/
+*.log
+audit-trail.jsonl
+transcripts/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Test coverage
+coverage/
+.nyc_output/
+
+# Chroma vector DB data
+chroma-data/
+
+# Bun
+bun.lockb
