@@ -7,8 +7,6 @@ Private keys are generated inside a TEE. They never leave. Every trade is provab
 
 [![Build](https://img.shields.io/github/actions/workflow/status/YOUR_ORG/enclave-trade/ci.yml?branch=main&style=flat-square&label=Build)](https://github.com/YOUR_ORG/enclave-trade/actions)
 [![License: AGPL-3.0](https://img.shields.io/badge/License-AGPL--3.0-blue?style=flat-square)](LICENSE)
-[![Model: Claude Sonnet 4.5](https://img.shields.io/badge/Model-Claude%20Sonnet%204.5-cc7800?style=flat-square)](https://docs.anthropic.com/en/docs/models-overview)
-[![Network: Solana](https://img.shields.io/badge/Network-Solana-9945FF?style=flat-square)](https://solana.com)
 [![Built with Claude Agent SDK](https://img.shields.io/badge/Built%20with-Claude%20Agent%20SDK-cc7800?style=flat-square)](https://docs.anthropic.com/en/docs/agents-and-tools/claude-agent-sdk)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178C6?style=flat-square)](https://www.typescriptlang.org/)
 
