@@ -1,8 +1,8 @@
-# Architecture — enclave-trade
+# Architecture — aegis
 
 ## Overview
 
-enclave-trade is structured around a single invariant: **the signing key never exists outside the TEE boundary**.
+aegis is structured around a single invariant: **the signing key never exists outside the TEE boundary**.
 
 All other components — reasoning, risk, memory, execution — are designed to support and enforce this invariant.
 
