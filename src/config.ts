@@ -6,7 +6,7 @@ loadEnv();
 const ConfigSchema = z.object({
   ANTHROPIC_API_KEY: z.string().min(1, "ANTHROPIC_API_KEY is required"),
   HELIUS_API_KEY: z.string().min(1, "HELIUS_API_KEY is required"),
-  DATABASE_URL: z.string().default("file:./enclave-trade.db"),
+  DATABASE_URL: z.string().default("file:./aegis.db"),
 
   // Solana
   SOLANA_RPC_URL: z.string().url(),
