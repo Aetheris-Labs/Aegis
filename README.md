@@ -1,11 +1,11 @@
 <div align="center">
 
-# enclave-trade
+# Aegis
 
 **Autonomous Solana trading agent with in-enclave key custody and attested execution.**
 Private keys are generated inside a TEE. They never leave. Every trade is provably honest.
 
-[![Build](https://img.shields.io/github/actions/workflow/status/YOUR_ORG/enclave-trade/ci.yml?branch=main&style=flat-square&label=Build)](https://github.com/YOUR_ORG/enclave-trade/actions)
+[![Build](https://img.shields.io/github/actions/workflow/status/Aetheris-Labs/Aegis/ci.yml?branch=main&style=flat-square&label=Build)](https://github.com/Aetheris-Labs/Aegis/actions)
 ![License](https://img.shields.io/badge/license-MIT-blue)
 [![Built with Claude Agent SDK](https://img.shields.io/badge/Built%20with-Claude%20Agent%20SDK-cc7800?style=flat-square)](https://docs.anthropic.com/en/docs/agents-and-tools/claude-agent-sdk)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178C6?style=flat-square)](https://www.typescriptlang.org/)
@@ -16,7 +16,7 @@ Private keys are generated inside a TEE. They never leave. Every trade is provab
 
 Most agents store private keys in `.env` files. One leak and everything is gone.
 
-`enclave-trade` runs its entire decision loop inside a **Trusted Execution Environment**.
+`Aegis` runs its entire decision loop inside a **Trusted Execution Environment**.
 The Ed25519 signing key is generated inside the enclave and sealed there permanently.
 The host machine, the cloud provider, and the operator cannot read it.
 
@@ -112,8 +112,8 @@ flowchart TD
 ## Quick Start
 
 ```bash
-git clone https://github.com/YOUR_ORG/enclave-trade
-cd enclave-trade && bun install
+git clone https://github.com/Aetheris-Labs/Aegis
+cd Aegis && bun install
 bun run setup         # interactive wizard
 docker-compose up chroma -d
 bun run dev
