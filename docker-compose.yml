@@ -1,9 +1,9 @@
 version: "3.9"
 
 services:
-  enclave-trade:
+  aegis:
     build: .
-    container_name: enclave-trade
+    container_name: aegis
     restart: unless-stopped
     env_file: .env
     environment:
