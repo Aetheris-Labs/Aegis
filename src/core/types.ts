@@ -70,3 +70,4 @@ export interface AgentCycle {
   outcome?: TradeOutcome;
   attestationId?: string;
 }
+
