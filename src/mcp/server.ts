@@ -197,3 +197,4 @@ async function fetchWalletPositions(pubkey: PublicKey, connection: Connection) {
     positions: [],
   };
 }
+
