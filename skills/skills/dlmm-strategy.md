@@ -28,3 +28,4 @@ After each trade, record:
 - Pool address, bin range entered, TVL at entry
 - Fee earned vs IL at exit
 - Whether volume held or collapsed
+
