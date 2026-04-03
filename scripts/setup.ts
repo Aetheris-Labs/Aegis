@@ -2,7 +2,7 @@
 import * as p from "@clack/prompts";
 import { writeFileSync, existsSync, readFileSync } from "fs";
 
-p.intro("enclave-trade setup wizard");
+p.intro("aegis setup wizard");
 
 const teeMode = await p.select({
   message: "TEE mode",
@@ -39,7 +39,7 @@ const rpcUrl = `https://mainnet.helius-rpc.com/?api-key=${heliusKey}`;
 
 const envContent = `ANTHROPIC_API_KEY=${anthropicKey}
 HELIUS_API_KEY=${heliusKey}
-DATABASE_URL=file:./enclave-trade.db
+DATABASE_URL=file:./aegis.db
 SOLANA_RPC_URL=${rpcUrl}
 JITO_BLOCK_ENGINE_URL=https://mainnet.block-engine.jito.wtf
 TEE_MODE=${teeMode}
