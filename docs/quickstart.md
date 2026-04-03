@@ -10,8 +10,8 @@
 ## Install
 
 ```bash
-git clone https://github.com/YOUR_ORG/enclave-trade
-cd enclave-trade
+git clone https://github.com/YOUR_ORG/aegis
+cd aegis
 bun install
 ```
 
@@ -47,8 +47,8 @@ You'll see the agent loop start:
 2026-04-02T10:00:00Z [INFO] [tee] Initializing TEE runtime { mode: 'software' }
 2026-04-02T10:00:00Z [WARN] [tee] Running in SOFTWARE TEE mode — not suitable for production
 2026-04-02T10:00:00Z [INFO] [signer] Keypair generated and sealed { publicKey: '...' }
-2026-04-02T10:00:00Z [INFO] [enclave-trade] All subsystems ready. Starting agent loop.
-2026-04-02T10:00:00Z [INFO] [enclave-trade] Cycle start { cycleId: 'cycle-1-...', paperTrading: true }
+2026-04-02T10:00:00Z [INFO] [aegis] All subsystems ready. Starting agent loop.
+2026-04-02T10:00:00Z [INFO] [aegis] Cycle start { cycleId: 'cycle-1-...', paperTrading: true }
 ```
 
 ## Verify attestation
