@@ -1,10 +1,10 @@
-# Contributing to enclave-trade
+# Contributing to aegis
 
 ## Setup
 
 ```bash
-git clone https://github.com/YOUR_ORG/enclave-trade
-cd enclave-trade
+git clone https://github.com/YOUR_ORG/aegis
+cd aegis
 bun install
 cp .env.example .env
 # Fill in ANTHROPIC_API_KEY and HELIUS_API_KEY
