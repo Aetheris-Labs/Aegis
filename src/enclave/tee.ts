@@ -81,3 +81,4 @@ export class TEERuntime {
     return Buffer.from(this.measurementHash, "hex");
   }
 }
+
