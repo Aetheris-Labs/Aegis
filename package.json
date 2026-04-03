@@ -1,11 +1,11 @@
 {
-  "name": "enclave-trade",
+  "name": "aegis",
   "version": "1.0.0",
   "description": "Autonomous Solana trading agent with in-enclave key custody and attested execution",
   "main": "dist/main.js",
   "type": "module",
   "bin": {
-    "enclave-trade": "./dist/main.js"
+    "aegis": "./dist/main.js"
   },
   "scripts": {
     "start": "node dist/main.js",
@@ -51,7 +51,7 @@
   "license": "AGPL-3.0",
   "repository": {
     "type": "git",
-    "url": "https://github.com/YOUR_ORG/enclave-trade"
+    "url": "https://github.com/YOUR_ORG/aegis"
   }
 }
 
