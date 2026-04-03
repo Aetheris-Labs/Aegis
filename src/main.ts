@@ -12,11 +12,11 @@ import { createLogger } from "./core/logger.js";
 import { createHash } from "crypto";
 import type { TradeDecision, TradeOutcome } from "./core/types.js";
 
-const log = createLogger("enclave-trade");
+const log = createLogger("aegis");
 const client = new Anthropic({ apiKey: config.ANTHROPIC_API_KEY });
 
 async function bootstrap(): Promise<void> {
-  log.info("enclave-trade starting", {
+  log.info("aegis starting", {
     teeMode: config.TEE_MODE,
     paperTrading: config.PAPER_TRADING,
     strategies: config.ACTIVE_STRATEGIES,
@@ -38,7 +38,7 @@ async function bootstrap(): Promise<void> {
   const chroma = new ChromaClient({ path: config.CHROMA_URL });
 
   const memory = await AgentMemory.initialize(chroma, {
-    collectionName: "enclave-trade-memory",
+    collectionName: "aegis-memory",
     patternTTLDays: 90,
     warningTTLDays: 60,
     mergeSimilarityThreshold: 0.7,
