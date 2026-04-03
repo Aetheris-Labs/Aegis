@@ -26,3 +26,4 @@ description: Perpetual futures risk management rules for Drift Protocol
 - Never hold perp position overnight without stop-loss
 - Reduce size by 50% if drawdown > 10% on position
 - Never add to a losing position
+
