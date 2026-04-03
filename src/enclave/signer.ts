@@ -94,7 +94,7 @@ export class EnclaveSignerService {
   private static deriveSealKey(tee: TEERuntime): Buffer {
     // Seal key is derived from TEE measurement — changes if measurement changes
     return createHash("sha256")
-      .update("enclave-trade-seal-v1")
+      .update("aegis-seal-v1")
       .update(tee.getMeasurementBytes())
       .digest()
       .subarray(0, 32);
