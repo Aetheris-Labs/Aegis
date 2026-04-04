@@ -31,27 +31,9 @@ The agent that runs tomorrow is smarter than the one today. The key has never be
 
 ## System Architecture
 
-```
-┌──────────────────────────────────────────────────────────────┐
-│                    TEE Boundary (TDX / SEV-SNP)              │
-│                                                              │
-│  ┌─────────────┐    ┌──────────────────┐    ┌────────────┐  │
-│  │  MCP Server │───▶│  Claude Agent    │───▶│  Ed25519   │  │
-│  │  (data in)  │    │  SDK Loop        │    │  Signer    │  │
-│  └─────────────┘    └────────┬─────────┘    └─────┬──────┘  │
-│                              │                    │         │
-│                    ┌─────────▼─────────┐          │         │
-│                    │   Risk Engine     │          │         │
-│                    │   Memory (Chroma) │          │         │
-│                    └─────────┬─────────┘          │         │
-│                              │ Remote Quote        │         │
-└──────────────────────────────┼────────────────────┼─────────┘
-                               ▼                    ▼
-                    ┌─────────────────┐   ┌──────────────────┐
-                    │  Attestation    │   │   Solana RPC     │
-                    │  Verifier       │   │   (tx submit)    │
-                    └─────────────────┘   └──────────────────┘
-```
+![Architecture diagram](assets/preview-architecture.svg)
+
+Three-layer execution stack: hardware attestation (Intel TDX RTMR registers + AMD SEV-SNP VCEK chain), trusted enclave boundary (secp256k1 key that never exits), and network layer (RA-TLS to Jupiter v6 + signed transactions to Solana validator via Jito block engine).
 
 ---
 
@@ -148,6 +130,46 @@ See [.env.example](.env.example) for all options.
 - Human approval required for trades > `$500`
 - Circuit breaker: 3 losses in 1h → 4h cooldown
 - Trade idempotency prevents duplicate execution
+
+---
+
+## Technical Spec
+
+### Attestation & Key Custody
+
+**Intel TDX path**
+- Measurement registers RTMR[0]–RTMR[3] are extended at enclave init: [0] firmware, [1] OS kernel, [2] application, [3] runtime config
+- RTMR[3] is re-extended on every config reload; a drift in its value indicates tampered runtime parameters
+- Quote is generated per-trade, embedded in the audit log entry, verifiable against Intel PCS
+
+**AMD SEV-SNP path**
+- VCEK certificate chain: ARK (AMD root) → ASK (AMD signing key) → VCEK (per-chip, per-TCB)
+- VCEK is fetched from `kdsintf.amd.com` at startup and cached; `fetchedAt` timestamp gates rotation detection
+- VCEK rotation voids all in-flight attestation sessions — sessions must re-attest after chain refresh
+
+**Quote TTL & replay prevention**
+- Quote TTL: `QUOTE_TTL_SECONDS` (default 600s); stale quotes are rejected at the verifier
+- Monotonic `restartCounter` field on `TEERuntime`: incremented on every cold start, embedded in quote UserData
+- A quote with a lower counter than the current session is rejected — prevents pre-restart quote replay
+
+**Key lifecycle**
+- `secp256k1` keypair generated inside enclave boundary using `@noble/secp256k1` CSPRNG
+- Sealed with `AES-256-GCM`, key derived from TEE measurement (hardware-bound, not operator-visible)
+- `decrypted.fill(0)` called immediately after `Keypair.fromSecretKey()` — private key bytes do not persist on heap
+
+### Risk Engine
+
+| Check | Threshold | Notes |
+|-------|-----------|-------|
+| Slippage gate | `MAX_SLIPPAGE_BPS` (default 150) | Evaluated before RPC simulation; saves ~40ms per rejection |
+| Confidence gate | `CONFIDENCE_THRESHOLD` (default 0.65) | Claude agent confidence score |
+| Global drawdown halt | –15% | All new positions suspended |
+| Per-strategy halt | –20% | Strategy-level circuit breaker |
+| Human approval | > $500 single trade | Hard override; logged to audit trail |
+
+### RA-TLS
+
+All outbound connections from the enclave to Jupiter v6 and Solana RPC use Remote Attestation TLS. The TLS certificate is signed with a key whose public key is embedded in the attestation quote — the verifier confirms the certificate belongs to a genuine enclave before accepting the connection. No custom handshake code; handled by mbedTLS extension.
 
 ---
 
