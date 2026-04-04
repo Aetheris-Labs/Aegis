@@ -1,0 +1,267 @@
+<svg width="900" height="520" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 520">
+  <defs>
+    <filter id="tealGlow">
+      <feGaussianBlur stdDeviation="2.5" result="coloredBlur"/>
+      <feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="900" height="520" fill="#060d1a"/>
+
+  <!-- ═══ HEADER ═══ -->
+  <rect x="0" y="0" width="900" height="36" fill="#07101e"/>
+  <line x1="0" y1="36" x2="900" y2="36" stroke="#142030" stroke-width="1"/>
+  <text x="16" y="25" font-family="'Courier New',monospace" font-size="14" font-weight="bold" fill="#00e5cc" filter="url(#tealGlow)">AEGIS</text>
+  <text x="70" y="25" font-family="'Courier New',monospace" font-size="8" fill="#1e3040">/ tee execution layer</text>
+  <!-- Status pills -->
+  <rect x="244" y="11" width="76" height="15" rx="2" fill="#061a14" stroke="#00e5cc40" stroke-width="1"/>
+  <circle cx="254" cy="18.5" r="3" fill="#00e5cc"/>
+  <text x="261" y="22" font-family="'Courier New',monospace" font-size="7" fill="#00e5cc">TDX ACTIVE</text>
+  <rect x="328" y="11" width="68" height="15" rx="2" fill="#061a14" stroke="#00e5cc30" stroke-width="1"/>
+  <text x="336" y="22" font-family="'Courier New',monospace" font-size="7" fill="#00e5cc80">KEY SEALED</text>
+  <rect x="404" y="11" width="82" height="15" rx="2" fill="#07101e" stroke="#00e5cc20" stroke-width="1"/>
+  <text x="412" y="22" font-family="'Courier New',monospace" font-size="7" fill="#00e5cc50">QUOTE 4m12s AGO</text>
+  <rect x="494" y="11" width="60" height="15" rx="2" fill="#1a1000" stroke="#f59e0b30" stroke-width="1"/>
+  <text x="502" y="22" font-family="'Courier New',monospace" font-size="7" fill="#f59e0b80">PAPER MODE</text>
+  <text x="650" y="23" font-family="'Courier New',monospace" font-size="8" fill="#1e3040">uptime 6h 44m</text>
+  <text x="756" y="23" font-family="'Courier New',monospace" font-size="8" fill="#1e3040">7 trades today</text>
+  <text x="856" y="23" font-family="'Courier New',monospace" font-size="8" fill="#1e3040">v1.3</text>
+
+  <!-- ═══ LEFT PANEL: STRATEGY SIGNALS ═══ -->
+  <rect x="14" y="42" width="422" height="316" rx="3" fill="#07101e" stroke="#142030" stroke-width="1"/>
+  <rect x="14" y="42" width="422" height="20" rx="3" fill="#0a1828"/>
+  <rect x="14" y="52" width="422" height="10" fill="#0a1828"/>
+  <text x="22" y="57" font-family="'Courier New',monospace" font-size="9" fill="#00e5cc" letter-spacing="1">STRATEGY SIGNALS</text>
+  <text x="222" y="57" font-family="'Courier New',monospace" font-size="8" fill="#1e3040">3 active strategies</text>
+  <rect x="352" y="47" width="56" height="12" rx="2" fill="#06180e" stroke="#22c55e20" stroke-width="1"/>
+  <text x="358" y="57" font-family="'Courier New',monospace" font-size="7" fill="#22c55e60">evaluating</text>
+  <line x1="22" y1="64" x2="428" y2="64" stroke="#142030" stroke-width="0.5"/>
+
+  <!-- Signal 1: SOL/USDC DLMM -->
+  <text x="22" y="79" font-family="'Courier New',monospace" font-size="9" fill="#c8d8e8">SOL/USDC</text>
+  <rect x="100" y="70" width="36" height="12" rx="1" fill="#0a1828" stroke="#3b82f630" stroke-width="0.5"/>
+  <text x="105" y="80" font-family="'Courier New',monospace" font-size="8" fill="#60a5fa">DLMM</text>
+  <text x="144" y="79" font-family="'Courier New',monospace" font-size="8" fill="#1e3040">Meteora  ·  fee 20bps</text>
+  <text x="22" y="92" font-family="'Courier New',monospace" font-size="8" fill="#2e4a5a">bin 142/200  range [123.40 – 127.82]  TVL $2.1M  vol $840k/24h</text>
+  <text x="22" y="105" font-family="'Courier New',monospace" font-size="8" fill="#2e4a5a">→ ADD_LIQUIDITY </text>
+  <text x="128" y="105" font-family="'Courier New',monospace" font-size="8" fill="#f59e0b">$200</text>
+  <text x="160" y="105" font-family="'Courier New',monospace" font-size="8" fill="#2e4a5a">  conf </text>
+  <text x="196" y="105" font-family="'Courier New',monospace" font-size="8" fill="#c8d8e8">0.74</text>
+  <rect x="248" y="96" width="60" height="13" rx="2" fill="#061a14" stroke="#22c55e40" stroke-width="1"/>
+  <text x="254" y="106" font-family="'Courier New',monospace" font-size="8" fill="#22c55e">✓ APPROVED</text>
+  <line x1="22" y1="112" x2="428" y2="112" stroke="#142030" stroke-width="0.5"/>
+
+  <!-- Signal 2: BTC-PERP Drift -->
+  <text x="22" y="127" font-family="'Courier New',monospace" font-size="9" fill="#c8d8e8">BTC-PERP</text>
+  <rect x="108" y="118" width="34" height="12" rx="1" fill="#0a1828" stroke="#8b5cf630" stroke-width="0.5"/>
+  <text x="113" y="128" font-family="'Courier New',monospace" font-size="8" fill="#a78bfa">Drift</text>
+  <text x="150" y="127" font-family="'Courier New',monospace" font-size="8" fill="#1e3040">perps  ·  perpetual futures</text>
+  <text x="22" y="140" font-family="'Courier New',monospace" font-size="8" fill="#2e4a5a">funding +0.018%/h  OI $12.4M  mark 97,840  oracle 97,822  Δ +$18</text>
+  <text x="22" y="153" font-family="'Courier New',monospace" font-size="8" fill="#2e4a5a">→ LONG </text>
+  <text x="72" y="153" font-family="'Courier New',monospace" font-size="8" fill="#f59e0b">$300</text>
+  <text x="104" y="153" font-family="'Courier New',monospace" font-size="8" fill="#2e4a5a">  conf </text>
+  <text x="140" y="153" font-family="'Courier New',monospace" font-size="8" fill="#c8d8e8">0.71</text>
+  <rect x="190" y="144" width="60" height="13" rx="2" fill="#061a14" stroke="#22c55e40" stroke-width="1"/>
+  <text x="196" y="154" font-family="'Courier New',monospace" font-size="8" fill="#22c55e">✓ APPROVED</text>
+  <line x1="22" y1="160" x2="428" y2="160" stroke="#142030" stroke-width="0.5"/>
+
+  <!-- Signal 3: JUP/SOL spot -->
+  <text x="22" y="175" font-family="'Courier New',monospace" font-size="9" fill="#c8d8e8">JUP/SOL</text>
+  <rect x="98" y="166" width="60" height="12" rx="1" fill="#0a1828" stroke="#00e5cc30" stroke-width="0.5"/>
+  <text x="103" y="176" font-family="'Courier New',monospace" font-size="8" fill="#00e5cc80">Jupiter v6</text>
+  <text x="166" y="175" font-family="'Courier New',monospace" font-size="8" fill="#1e3040">spot swap</text>
+  <text x="22" y="188" font-family="'Courier New',monospace" font-size="8" fill="#2e4a5a">price impact 0.04%  route: JUP→USDC→SOL  1 hop  slippage 12bps</text>
+  <text x="22" y="201" font-family="'Courier New',monospace" font-size="8" fill="#2e4a5a">→ BUY </text>
+  <text x="66" y="201" font-family="'Courier New',monospace" font-size="8" fill="#f59e0b">$180</text>
+  <text x="98" y="201" font-family="'Courier New',monospace" font-size="8" fill="#2e4a5a">  conf </text>
+  <text x="134" y="201" font-family="'Courier New',monospace" font-size="8" fill="#c8d8e8">0.68</text>
+  <text x="165" y="201" font-family="'Courier New',monospace" font-size="8" fill="#2e4a5a">  slippage </text>
+  <text x="230" y="201" font-family="'Courier New',monospace" font-size="8" fill="#c8d8e8">12bps &lt; 150bps max</text>
+  <rect x="350" y="192" width="60" height="13" rx="2" fill="#061a14" stroke="#22c55e40" stroke-width="1"/>
+  <text x="356" y="202" font-family="'Courier New',monospace" font-size="8" fill="#22c55e">✓ APPROVED</text>
+  <line x1="22" y1="208" x2="428" y2="208" stroke="#142030" stroke-width="1"/>
+
+  <!-- RISK ENGINE section -->
+  <text x="22" y="222" font-family="'Courier New',monospace" font-size="9" fill="#00e5cc80" letter-spacing="1">RISK ENGINE</text>
+  <line x1="22" y1="226" x2="428" y2="226" stroke="#142030" stroke-width="0.5"/>
+
+  <!-- drawdown gauge -->
+  <text x="22" y="240" font-family="'Courier New',monospace" font-size="8" fill="#2e4a5a">global drawdown</text>
+  <rect x="150" y="232" width="160" height="9" rx="1" fill="#0f1c28"/>
+  <rect x="150" y="232" width="22" height="9" rx="1" fill="#22c55e" opacity="0.7"/>
+  <text x="318" y="240" font-family="'Courier New',monospace" font-size="8" fill="#22c55e">-2.1%</text>
+  <text x="358" y="240" font-family="'Courier New',monospace" font-size="8" fill="#1e3040">limit -15%</text>
+
+  <text x="22" y="256" font-family="'Courier New',monospace" font-size="8" fill="#2e4a5a">open positions</text>
+  <rect x="150" y="248" width="160" height="9" rx="1" fill="#0f1c28"/>
+  <rect x="150" y="248" width="48" height="9" rx="1" fill="#00e5cc" opacity="0.5"/>
+  <text x="318" y="256" font-family="'Courier New',monospace" font-size="8" fill="#c8d8e8">3 / 5</text>
+  <text x="358" y="256" font-family="'Courier New',monospace" font-size="8" fill="#1e3040">limit 5</text>
+
+  <text x="22" y="272" font-family="'Courier New',monospace" font-size="8" fill="#2e4a5a">circuit breaker</text>
+  <text x="150" y="272" font-family="'Courier New',monospace" font-size="8" fill="#22c55e">OK</text>
+  <text x="180" y="272" font-family="'Courier New',monospace" font-size="8" fill="#1e3040">0 losses / 1h  (limit 3)</text>
+
+  <text x="22" y="288" font-family="'Courier New',monospace" font-size="8" fill="#2e4a5a">confidence avg</text>
+  <rect x="150" y="280" width="160" height="9" rx="1" fill="#0f1c28"/>
+  <rect x="150" y="280" width="113" height="9" rx="1" fill="#60a5fa" opacity="0.5"/>
+  <text x="318" y="288" font-family="'Courier New',monospace" font-size="8" fill="#c8d8e8">0.71</text>
+  <text x="358" y="288" font-family="'Courier New',monospace" font-size="8" fill="#1e3040">min 0.65</text>
+
+  <text x="22" y="304" font-family="'Courier New',monospace" font-size="8" fill="#2e4a5a">slippage gate</text>
+  <text x="150" y="304" font-family="'Courier New',monospace" font-size="8" fill="#22c55e">OK</text>
+  <text x="180" y="304" font-family="'Courier New',monospace" font-size="8" fill="#1e3040">max 12bps seen  (limit 150bps)</text>
+
+  <text x="22" y="320" font-family="'Courier New',monospace" font-size="8" fill="#2e4a5a">human approval</text>
+  <text x="150" y="320" font-family="'Courier New',monospace" font-size="8" fill="#22c55e">not required</text>
+  <text x="264" y="320" font-family="'Courier New',monospace" font-size="8" fill="#1e3040">all trades ≤ $300  (gate $500)</text>
+
+  <!-- ═══ RIGHT PANEL: EXECUTIONS + ATTESTATION ═══ -->
+  <rect x="448" y="42" width="438" height="316" rx="3" fill="#07101e" stroke="#142030" stroke-width="1"/>
+  <rect x="448" y="42" width="438" height="20" rx="3" fill="#0a1828"/>
+  <rect x="448" y="52" width="438" height="10" fill="#0a1828"/>
+  <text x="456" y="57" font-family="'Courier New',monospace" font-size="9" fill="#00e5cc" letter-spacing="1">RECENT EXECUTIONS</text>
+  <line x1="456" y1="64" x2="878" y2="64" stroke="#142030" stroke-width="0.5"/>
+
+  <!-- tx headers -->
+  <text x="456" y="78" font-family="'Courier New',monospace" font-size="7" fill="#1e3040">TX HASH</text>
+  <text x="572" y="78" font-family="'Courier New',monospace" font-size="7" fill="#1e3040">STRATEGY</text>
+  <text x="640" y="78" font-family="'Courier New',monospace" font-size="7" fill="#1e3040">ACTION</text>
+  <text x="706" y="78" font-family="'Courier New',monospace" font-size="7" fill="#1e3040">SIZE</text>
+  <text x="744" y="78" font-family="'Courier New',monospace" font-size="7" fill="#1e3040">SLOT</text>
+  <line x1="456" y1="81" x2="878" y2="81" stroke="#142030" stroke-width="0.5"/>
+
+  <!-- tx 1 -->
+  <text x="456" y="95" font-family="'Courier New',monospace" font-size="8" fill="#00e5cc80">8xKpJm…n3QwR</text>
+  <text x="572" y="95" font-family="'Courier New',monospace" font-size="8" fill="#c8d8e8">DLMM</text>
+  <text x="640" y="95" font-family="'Courier New',monospace" font-size="8" fill="#c8d8e8">ADD_LIQ</text>
+  <text x="706" y="95" font-family="'Courier New',monospace" font-size="8" fill="#f59e0b">$200</text>
+  <text x="744" y="95" font-family="'Courier New',monospace" font-size="8" fill="#1e3040">342,891,204</text>
+  <circle cx="856" cy="92" r="3" fill="#22c55e"/>
+  <line x1="456" y1="100" x2="878" y2="100" stroke="#142030" stroke-width="0.5"/>
+
+  <!-- tx 2 -->
+  <text x="456" y="114" font-family="'Courier New',monospace" font-size="8" fill="#00e5cc80">Rt7mFn…4jHsT</text>
+  <text x="572" y="114" font-family="'Courier New',monospace" font-size="8" fill="#c8d8e8">DRIFT</text>
+  <text x="640" y="114" font-family="'Courier New',monospace" font-size="8" fill="#c8d8e8">LONG</text>
+  <text x="706" y="114" font-family="'Courier New',monospace" font-size="8" fill="#f59e0b">$300</text>
+  <text x="744" y="114" font-family="'Courier New',monospace" font-size="8" fill="#1e3040">342,891,187</text>
+  <circle cx="856" cy="111" r="3" fill="#22c55e"/>
+  <line x1="456" y1="119" x2="878" y2="119" stroke="#142030" stroke-width="0.5"/>
+
+  <!-- tx 3 -->
+  <text x="456" y="133" font-family="'Courier New',monospace" font-size="8" fill="#00e5cc80">Kq2nXp…8pFvM</text>
+  <text x="572" y="133" font-family="'Courier New',monospace" font-size="8" fill="#c8d8e8">SPOT</text>
+  <text x="640" y="133" font-family="'Courier New',monospace" font-size="8" fill="#c8d8e8">BUY</text>
+  <text x="706" y="133" font-family="'Courier New',monospace" font-size="8" fill="#f59e0b">$180</text>
+  <text x="744" y="133" font-family="'Courier New',monospace" font-size="8" fill="#1e3040">342,891,163</text>
+  <circle cx="856" cy="130" r="3" fill="#22c55e"/>
+  <line x1="456" y1="138" x2="878" y2="138" stroke="#142030" stroke-width="0.5"/>
+
+  <!-- tx 4 - older -->
+  <text x="456" y="152" font-family="'Courier New',monospace" font-size="8" fill="#1e3040">3wNbZc…7dYkP</text>
+  <text x="572" y="152" font-family="'Courier New',monospace" font-size="8" fill="#1e3040">DLMM</text>
+  <text x="640" y="152" font-family="'Courier New',monospace" font-size="8" fill="#1e3040">REM_LIQ</text>
+  <text x="706" y="152" font-family="'Courier New',monospace" font-size="8" fill="#1e3040">$165</text>
+  <text x="744" y="152" font-family="'Courier New',monospace" font-size="8" fill="#1e3040">342,887,441</text>
+  <circle cx="856" cy="149" r="3" fill="#1e3040"/>
+  <line x1="456" y1="157" x2="878" y2="157" stroke="#142030" stroke-width="1"/>
+
+  <!-- ATTESTATION STATUS -->
+  <text x="456" y="171" font-family="'Courier New',monospace" font-size="9" fill="#00e5cc80" letter-spacing="1">ATTESTATION STATUS</text>
+  <line x1="456" y1="175" x2="878" y2="175" stroke="#142030" stroke-width="0.5"/>
+
+  <text x="456" y="190" font-family="'Courier New',monospace" font-size="8" fill="#2e4a5a">TEE mode</text>
+  <text x="578" y="190" font-family="'Courier New',monospace" font-size="8" fill="#00e5cc">Intel TDX</text>
+  <text x="700" y="190" font-family="'Courier New',monospace" font-size="8" fill="#1e3040">hardware-enforced</text>
+
+  <text x="456" y="204" font-family="'Courier New',monospace" font-size="8" fill="#2e4a5a">RTMR[0–3]</text>
+  <text x="578" y="204" font-family="'Courier New',monospace" font-size="8" fill="#22c55e">all measured ✓</text>
+  <text x="700" y="204" font-family="'Courier New',monospace" font-size="8" fill="#1e3040">no drift detected</text>
+
+  <text x="456" y="218" font-family="'Courier New',monospace" font-size="8" fill="#2e4a5a">remote quote</text>
+  <text x="578" y="218" font-family="'Courier New',monospace" font-size="8" fill="#f59e0b">4m 12s ago</text>
+  <text x="700" y="218" font-family="'Courier New',monospace" font-size="8" fill="#1e3040">TTL 10m  (fresh)</text>
+
+  <text x="456" y="232" font-family="'Courier New',monospace" font-size="8" fill="#2e4a5a">quote digest</text>
+  <text x="578" y="232" font-family="'Courier New',monospace" font-size="8" fill="#00e5cc50">a3f9c…7e2d</text>
+  <text x="700" y="232" font-family="'Courier New',monospace" font-size="8" fill="#1e3040">verifiable externally</text>
+
+  <text x="456" y="246" font-family="'Courier New',monospace" font-size="8" fill="#2e4a5a">RA-TLS</text>
+  <text x="578" y="246" font-family="'Courier New',monospace" font-size="8" fill="#22c55e">active ✓</text>
+  <text x="700" y="246" font-family="'Courier New',monospace" font-size="8" fill="#1e3040">mbedTLS  cert in quote</text>
+
+  <text x="456" y="260" font-family="'Courier New',monospace" font-size="8" fill="#2e4a5a">signing key</text>
+  <text x="578" y="260" font-family="'Courier New',monospace" font-size="8" fill="#22c55e">sealed  never transmitted ✓</text>
+  <line x1="456" y1="266" x2="878" y2="266" stroke="#142030" stroke-width="1"/>
+
+  <!-- AGENT REASONING -->
+  <text x="456" y="280" font-family="'Courier New',monospace" font-size="9" fill="#00e5cc80" letter-spacing="1">CLAUDE REASONING  (current cycle)</text>
+  <line x1="456" y1="284" x2="878" y2="284" stroke="#142030" stroke-width="0.5"/>
+
+  <text x="456" y="298" font-family="'Courier New',monospace" font-size="7.5" fill="#4a6a7a">"Evaluating SOL/USDC DLMM: bin 142 is within 2.8% of upper</text>
+  <text x="456" y="311" font-family="'Courier New',monospace" font-size="7.5" fill="#4a6a7a">range boundary. TVL $2.1M + vol $840k/24h → ~22bps effective</text>
+  <text x="456" y="324" font-family="'Courier New',monospace" font-size="7.5" fill="#4a6a7a">fee per cycle. BTC-PERP funding +0.018%/h annualizes to ~158%</text>
+  <text x="456" y="337" font-family="'Courier New',monospace" font-size="7.5" fill="#4a6a7a">on long side — break-even hold 3.1h, current plan 8–12h.</text>
+  <text x="456" y="350" font-family="'Courier New',monospace" font-size="7.5" fill="#4a6a7a">Risk engine: drawdown -2.1% vs -15% limit, CB clear. Submitting."</text>
+
+  <!-- ═══ BOTTOM PANEL: EXECUTION LOG ═══ -->
+  <rect x="14" y="364" width="872" height="142" rx="3" fill="#07101e" stroke="#142030" stroke-width="1"/>
+  <rect x="14" y="364" width="872" height="20" rx="3" fill="#0a1828"/>
+  <rect x="14" y="374" width="872" height="10" fill="#0a1828"/>
+  <text x="22" y="378" font-family="'Courier New',monospace" font-size="9" fill="#00e5cc" letter-spacing="1">AUDIT LOG</text>
+  <text x="152" y="378" font-family="'Courier New',monospace" font-size="8" fill="#1e3040">immutable JSONL  ·  every decision recorded with attestation quote</text>
+
+  <!-- column headers -->
+  <text x="22" y="396" font-family="'Courier New',monospace" font-size="7" fill="#1e3040">TIME    </text>
+  <text x="72" y="396" font-family="'Courier New',monospace" font-size="7" fill="#1e3040">DECISION</text>
+  <text x="280" y="396" font-family="'Courier New',monospace" font-size="7" fill="#1e3040">RISK CHECK</text>
+  <text x="440" y="396" font-family="'Courier New',monospace" font-size="7" fill="#1e3040">TEE QUOTE</text>
+  <text x="580" y="396" font-family="'Courier New',monospace" font-size="7" fill="#1e3040">TX</text>
+  <text x="760" y="396" font-family="'Courier New',monospace" font-size="7" fill="#1e3040">OUTCOME</text>
+  <line x1="22" y1="399" x2="878" y2="399" stroke="#142030" stroke-width="0.5"/>
+
+  <text x="22" y="413" font-family="'Courier New',monospace" font-size="8" fill="#2e4a5a">14:23:41</text>
+  <text x="72" y="413" font-family="'Courier New',monospace" font-size="8" fill="#c8d8e8">DLMM ADD_LIQ SOL/USDC $200 conf 0.74</text>
+  <text x="280" y="413" font-family="'Courier New',monospace" font-size="8" fill="#22c55e">pass</text>
+  <text x="440" y="413" font-family="'Courier New',monospace" font-size="8" fill="#00e5cc50">a3f9c…7e2d</text>
+  <text x="580" y="413" font-family="'Courier New',monospace" font-size="8" fill="#00e5cc80">8xKpJm…n3QwR</text>
+  <circle cx="756" cy="410" r="3" fill="#22c55e"/>
+  <text x="764" y="413" font-family="'Courier New',monospace" font-size="8" fill="#22c55e">confirmed</text>
+
+  <text x="22" y="427" font-family="'Courier New',monospace" font-size="8" fill="#2e4a5a">13:51:12</text>
+  <text x="72" y="427" font-family="'Courier New',monospace" font-size="8" fill="#c8d8e8">DRIFT LONG BTC-PERP $300 conf 0.71</text>
+  <text x="280" y="427" font-family="'Courier New',monospace" font-size="8" fill="#22c55e">pass</text>
+  <text x="440" y="427" font-family="'Courier New',monospace" font-size="8" fill="#00e5cc50">a3f9c…7e2d</text>
+  <text x="580" y="427" font-family="'Courier New',monospace" font-size="8" fill="#00e5cc80">Rt7mFn…4jHsT</text>
+  <circle cx="756" cy="424" r="3" fill="#22c55e"/>
+  <text x="764" y="427" font-family="'Courier New',monospace" font-size="8" fill="#22c55e">confirmed</text>
+
+  <text x="22" y="441" font-family="'Courier New',monospace" font-size="8" fill="#2e4a5a">13:22:05</text>
+  <text x="72" y="441" font-family="'Courier New',monospace" font-size="8" fill="#c8d8e8">SPOT BUY JUP/SOL $180 conf 0.68</text>
+  <text x="280" y="441" font-family="'Courier New',monospace" font-size="8" fill="#22c55e">pass</text>
+  <text x="440" y="441" font-family="'Courier New',monospace" font-size="8" fill="#00e5cc50">a3f9c…7e2d</text>
+  <text x="580" y="441" font-family="'Courier New',monospace" font-size="8" fill="#00e5cc80">Kq2nXp…8pFvM</text>
+  <circle cx="756" cy="438" r="3" fill="#22c55e"/>
+  <text x="764" y="441" font-family="'Courier New',monospace" font-size="8" fill="#22c55e">confirmed</text>
+
+  <text x="22" y="455" font-family="'Courier New',monospace" font-size="8" fill="#1e3040">12:44:31</text>
+  <text x="72" y="455" font-family="'Courier New',monospace" font-size="8" fill="#1e3040">SPOT BUY ORCA/SOL $240 conf 0.63</text>
+  <text x="280" y="455" font-family="'Courier New',monospace" font-size="8" fill="#ef4444a0">rejected</text>
+  <text x="440" y="455" font-family="'Courier New',monospace" font-size="8" fill="#1e3040">—</text>
+  <text x="580" y="455" font-family="'Courier New',monospace" font-size="8" fill="#1e3040">—</text>
+  <circle cx="756" cy="452" r="3" fill="#2e4a5a"/>
+  <text x="764" y="455" font-family="'Courier New',monospace" font-size="8" fill="#2e4a5a">risk: conf 0.63 &lt; 0.65 min</text>
+
+  <text x="22" y="469" font-family="'Courier New',monospace" font-size="8" fill="#1e3040">11:58:19</text>
+  <text x="72" y="469" font-family="'Courier New',monospace" font-size="8" fill="#1e3040">DRIFT LONG SOL-PERP $350 conf 0.70</text>
+  <text x="280" y="469" font-family="'Courier New',monospace" font-size="8" fill="#ef4444a0">rejected</text>
+  <text x="440" y="469" font-family="'Courier New',monospace" font-size="8" fill="#1e3040">—</text>
+  <text x="580" y="469" font-family="'Courier New',monospace" font-size="8" fill="#1e3040">—</text>
+  <circle cx="756" cy="466" r="3" fill="#2e4a5a"/>
+  <text x="764" y="469" font-family="'Courier New',monospace" font-size="8" fill="#2e4a5a">risk: slippage 182bps &gt; 150bps max</text>
+
+  <!-- Footer -->
+  <text x="450" y="511" font-family="'Courier New',monospace" font-size="8" fill="#07101e" text-anchor="middle">AEGIS  ·  TRUSTED EXECUTION ENVIRONMENT  ·  INTEL TDX  ·  RA-TLS  ·  CLAUDE AGENT SDK</text>
+</svg>

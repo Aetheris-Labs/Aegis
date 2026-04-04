@@ -29,6 +29,12 @@ The agent that runs tomorrow is smarter than the one today. The key has never be
 
 ---
 
+## Live Execution
+
+![Live execution dashboard](assets/preview-live.svg)
+
+Real-time view of Aegis running: strategy signals from Meteora DLMM, Drift perps, and Jupiter spot with live confidence scores and risk gate results, confirmed Solana transactions with truncated hashes, attestation status, and Claude's full reasoning for the current decision cycle.
+
 ## System Architecture
 
 ![Architecture diagram](assets/preview-architecture.svg)
