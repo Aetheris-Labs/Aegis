@@ -22,6 +22,8 @@ const ConfigSchema = z.object({
     .string()
     .transform((v) => v === "true")
     .default("false"),
+  QUOTE_TTL_SECONDS: z.coerce.number().default(600),
+  MAX_SLIPPAGE_BPS: z.coerce.number().default(150),
 
   // Trading
   PAPER_TRADING: z
