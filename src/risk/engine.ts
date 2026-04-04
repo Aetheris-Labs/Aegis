@@ -9,6 +9,9 @@ export interface RiskConfig {
   maxPositionsPerStrategy: number;
   confidenceThreshold: number;
   humanApprovalThresholdUSD: number;
+  // Maximum acceptable slippage in basis points (1 bps = 0.01%).
+  // Trades exceeding this are rejected before simulation — saves ~40ms RPC latency.
+  maxSlippageBps: number;
 }
 
 export class RiskEngine {
@@ -28,7 +31,18 @@ export class RiskEngine {
   }
 
   async evaluate(decision: TradeDecision): Promise<RiskResult> {
-    // 1. Confidence gate
+    // Policy checks run BEFORE transaction simulation.
+    // Rejecting here avoids a round-trip to the RPC node (~40ms saved per rejection).
+
+    // 1. Slippage gate — reject before anything else
+    if ((decision.slippageBps ?? 0) > this.config.maxSlippageBps) {
+      return {
+        approved: false,
+        reason: `Slippage ${decision.slippageBps}bps exceeds max ${this.config.maxSlippageBps}bps`,
+      };
+    }
+
+    // 2. Confidence gate
     if (decision.confidence < this.config.confidenceThreshold) {
       return {
         approved: false,
