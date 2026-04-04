@@ -88,7 +88,15 @@ export class EnclaveSignerService {
     decipher.setAuthTag(authTag);
 
     const decrypted = Buffer.concat([decipher.update(encrypted), decipher.final()]);
-    return Keypair.fromSecretKey(decrypted);
+    const keypair = Keypair.fromSecretKey(decrypted);
+
+    // Zeroize key material from intermediate buffer immediately after use.
+    // Buffer.fill(0) ensures private key bytes don't persist on the heap
+    // beyond this stack frame — critical inside TEE where heap is encrypted
+    // but zeroization limits exposure window if memory is ever swapped.
+    decrypted.fill(0);
+
+    return keypair;
   }
 
   private static deriveSealKey(tee: TEERuntime): Buffer {
