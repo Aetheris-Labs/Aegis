@@ -56,7 +56,7 @@ export function createLogger(component: string) {
     const dataStr = data ? ` ${JSON.stringify(data)}` : "";
     console.log(`${entry.ts} ${prefix} [${component}] ${message}${dataStr}`);
 
-    // JSONL audit trail (all levels except debug)
+    // JSONL audit trail — debug excluded; warn/error always written regardless of log level filter
     if (level !== "debug") {
       writeAuditEntry(entry);
     }
