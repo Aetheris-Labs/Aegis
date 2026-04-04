@@ -14,11 +14,15 @@ export class TEERuntime {
   readonly mode: TEEMode;
   readonly measurementHash: string;
   readonly isHardwareMode: boolean;
+  // Monotonic counter tracks enclave restarts. Incremented on each
+  // cold init. Allows detection of stale pre-restart attestation quotes.
+  readonly restartCounter: number;
 
-  private constructor(mode: TEEMode, measurementHash: string) {
+  private constructor(mode: TEEMode, measurementHash: string, restartCounter = 0) {
     this.mode = mode;
     this.measurementHash = measurementHash;
     this.isHardwareMode = mode === "tdx" || mode === "sev";
+    this.restartCounter = restartCounter;
   }
 
   static async initialize(opts: TEERuntimeOptions): Promise<TEERuntime> {
