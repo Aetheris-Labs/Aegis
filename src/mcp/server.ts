@@ -184,9 +184,19 @@ async function fetchJupiterQuote(input: Record<string, unknown>) {
     amount: String(input["amount_lamports"]),
     slippageBps: String(input["slippage_bps"] ?? 50),
   });
-  const res = await fetch(`https://quote-api.jup.ag/v6/quote?${params}`);
-  if (!res.ok) throw new Error(`Jupiter API error: ${res.status}`);
-  return res.json();
+  // Jupiter v6 rate-limits at ~10 req/s per IP; retry with backoff on 429
+  let lastErr: Error | null = null;
+  for (let attempt = 0; attempt < 3; attempt++) {
+    const res = await fetch(`https://quote-api.jup.ag/v6/quote?${params}`);
+    if (res.status === 429) {
+      await new Promise((r) => setTimeout(r, 200 * 2 ** attempt));
+      lastErr = new Error("Jupiter rate limited");
+      continue;
+    }
+    if (!res.ok) throw new Error(`Jupiter API error: ${res.status}`);
+    return res.json();
+  }
+  throw lastErr;
 }
 
 async function fetchWalletPositions(pubkey: PublicKey, connection: Connection) {
