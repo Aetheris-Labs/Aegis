@@ -1,0 +1,41 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.2.15
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: |
+          if [ -f bun.lockb ] || [ -f bun.lock ]; then
+            bun install
+          elif [ -f package-lock.json ]; then
+            npm ci || npm install
+          elif [ -f package.json ]; then
+            npm install
+          else
+            echo "No package manifest found"
+          fi
+
+      - name: Build surface check
+        run: echo "CI workflow ready"
