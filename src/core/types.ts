@@ -17,6 +17,7 @@ export interface TradeDecision {
   sizeUSD: number;
   confidence: number;
   reasoning: string;
+  slippageBps?: number;
   params?: Record<string, unknown>;
 }
 

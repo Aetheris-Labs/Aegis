@@ -5,8 +5,6 @@ import type { AttestationQuote } from "../core/types.js";
 
 const log = createLogger("attestation");
 
-// Quote TTL: 10 minutes. Must be refreshed before expiry to prevent
-// replay of stale quotes across VCEK rotation boundaries.
 const QUOTE_TTL_MS = 10 * 60 * 1000;
 
 interface QuoteRequest {
@@ -15,13 +13,16 @@ interface QuoteRequest {
   timestamp: number;
 }
 
-// AMD SEV-SNP attestation uses VCEK (Versioned Chip Endorsement Key) derived
-// from the chip's UDS. VCEK certificates are fetched from AMD KDS and must be
-// re-verified after firmware updates that trigger VCEK rotation.
+interface VerifyQuoteRequest {
+  expectedDecisionHash: string;
+  expectedCycleId: string;
+  requireHardware: boolean;
+}
+
 interface VCEKChain {
   vcekCert: Buffer;
-  askCert: Buffer;   // AMD Signing Key
-  arkCert: Buffer;   // AMD Root Key
+  askCert: Buffer;
+  arkCert: Buffer;
   fetchedAt: number;
 }
 
@@ -29,13 +30,15 @@ export class AttestationService {
   private readonly tee: TEERuntime;
   private vcekChain: VCEKChain | null = null;
   private lastQuoteAt = 0;
+  private readonly quoteTtlMs: number;
 
-  constructor(tee: TEERuntime) {
+  constructor(tee: TEERuntime, opts?: { quoteTtlMs?: number }) {
     this.tee = tee;
+    this.quoteTtlMs = opts?.quoteTtlMs ?? QUOTE_TTL_MS;
   }
 
   isQuoteStale(): boolean {
-    return Date.now() - this.lastQuoteAt > QUOTE_TTL_MS;
+    return Date.now() - this.lastQuoteAt > this.quoteTtlMs;
   }
 
   async generateQuote(req: QuoteRequest): Promise<AttestationQuote> {
@@ -56,17 +59,11 @@ export class AttestationService {
   }
 
   private async generateHardwareQuote(req: QuoteRequest): Promise<AttestationQuote> {
-    // TDX path: call DCAP library, bind decisionHash into REPORTDATA[0:32].
-    // SEV-SNP path: call sev-guest ioctl, bind into REPORT_DATA field.
-    // Both paths produce a hardware-rooted quote verifiable via their
-    // respective certificate chains (Intel PCS / AMD KDS).
     const reportData = createHash("sha256")
       .update(req.decisionHash)
       .update(req.cycleId)
       .digest();
 
-    // TDX: const rawQuote = await tdxAttest.generateQuote(reportData)
-    // SEV: const rawQuote = await sevGuest.getReport(reportData)
     const rawQuote = Buffer.concat([
       Buffer.from(this.tee.mode === "sev" ? "SEVSNP-STUB-v1.0" : "TDQUOTE-STUB-v1.0"),
       this.tee.getMeasurementBytes(),
@@ -102,15 +99,47 @@ export class AttestationService {
     };
   }
 
-  async verifyQuote(quote: AttestationQuote): Promise<boolean> {
-    if (!quote.isHardwareBacked) {
-      log.warn("Software quote — skipping hardware verification");
-      return true;
+  async verifyQuote(quote: AttestationQuote, req: VerifyQuoteRequest): Promise<boolean> {
+    if (Date.now() - quote.timestamp > this.quoteTtlMs) {
+      log.warn("Quote rejected: stale", { id: quote.id });
+      return false;
     }
-    // Production: submit rawQuote to Intel PCS for verification
-    // Returns true if quote is valid and measurement matches expected
-    log.info("Hardware quote verification (stub)", { id: quote.id });
+
+    if (quote.decisionHash !== req.expectedDecisionHash || quote.cycleId !== req.expectedCycleId) {
+      log.warn("Quote rejected: binding mismatch", { id: quote.id });
+      return false;
+    }
+
+    if (!quote.isHardwareBacked) {
+      if (req.requireHardware) {
+        log.warn("Quote rejected: hardware attestation required", { id: quote.id });
+        return false;
+      }
+
+      const expected = createHash("sha256")
+        .update("software-quote")
+        .update(this.tee.measurementHash)
+        .update(req.expectedDecisionHash)
+        .update(req.expectedCycleId)
+        .digest();
+
+      const valid = quote.rawQuote.equals(expected);
+      if (!valid) {
+        log.warn("Software quote rejected: digest mismatch", { id: quote.id });
+      }
+      return valid;
+    }
+
+    const expectedPrefix = this.tee.mode === "sev" ? "SEVSNP-STUB-v1.0" : "TDQUOTE-STUB-v1.0";
+    const hasPrefix = quote.rawQuote.subarray(0, expectedPrefix.length).equals(Buffer.from(expectedPrefix));
+    const hasMeasurement = quote.rawQuote.includes(this.tee.getMeasurementBytes());
+
+    if (!hasPrefix || !hasMeasurement) {
+      log.warn("Hardware quote rejected: malformed payload", { id: quote.id });
+      return false;
+    }
+
+    log.info("Hardware quote structurally verified", { id: quote.id, mode: this.tee.mode });
     return true;
   }
 }
-

@@ -34,7 +34,9 @@ async function bootstrap(): Promise<void> {
   const signer = await EnclaveSignerService.initialize(tee);
   log.info("In-enclave signer ready", { publicKey: signer.publicKey.toBase58() });
 
-  const attestation = new AttestationService(tee);
+  const attestation = new AttestationService(tee, {
+    quoteTtlMs: config.QUOTE_TTL_SECONDS * 1000,
+  });
   const chroma = new ChromaClient({ path: config.CHROMA_URL });
 
   const memory = await AgentMemory.initialize(chroma, {
@@ -51,6 +53,7 @@ async function bootstrap(): Promise<void> {
     maxPositionsPerStrategy: 3,
     confidenceThreshold: config.CONFIDENCE_THRESHOLD,
     humanApprovalThresholdUSD: config.MAX_POSITION_SIZE_USD,
+    maxSlippageBps: config.MAX_SLIPPAGE_BPS,
   });
 
   const mcpServer = await createMCPServer({
@@ -132,6 +135,9 @@ async function runLoop(deps: {
                 sizeUSD: input["size_usd"] as number,
                 confidence: input["confidence"] as number,
                 reasoning: input["reasoning"] as string,
+                ...(input["slippage_bps"] !== undefined
+                  ? { slippageBps: Number(input["slippage_bps"]) }
+                  : {}),
               };
               break agentLoop;
             }
@@ -154,11 +160,30 @@ async function runLoop(deps: {
         log.info("No trade this cycle", { cycleId });
       } else {
         // ATTEST
+        const decisionHash = createHash("sha256").update(JSON.stringify(decision)).digest("hex");
         const quote = await attestation.generateQuote({
-          decisionHash: createHash("sha256").update(JSON.stringify(decision)).digest("hex"),
+          decisionHash,
           cycleId,
           timestamp: Date.now(),
         });
+
+        const attestationApproved = await attestation.verifyQuote(quote, {
+          expectedDecisionHash: decisionHash,
+          expectedCycleId: cycleId,
+          requireHardware: config.REQUIRE_HARDWARE_TEE,
+        });
+
+        if (!attestationApproved) {
+          log.warn("Attestation rejected", { cycleId, decision });
+          await memory.upsert({
+            type: "warning",
+            content: `Attestation rejected for decision ${JSON.stringify(decision)}`,
+            timestamp: new Date(),
+          });
+          log.info("Cycle complete", { cycleId, durationMs: Date.now() - cycleStart });
+          await sleep(config.CYCLE_INTERVAL_MS);
+          continue;
+        }
 
         // VALIDATE
         const riskResult = await risk.evaluate(decision);
@@ -179,13 +204,7 @@ async function runLoop(deps: {
           }
 
           // LEARN
-          const outcome: TradeOutcome = {
-            cycleId,
-            pnlUSD: (Math.random() - 0.45) * decision.sizeUSD * 0.02,
-            slippageBps: Math.floor(Math.random() * 25),
-            latencyMs: Date.now() - cycleStart,
-            simulated: config.PAPER_TRADING,
-          };
+          const outcome = derivePaperOutcome(cycleId, decision, Date.now() - cycleStart);
 
           await memory.upsert({
             type: outcome.pnlUSD > 0 ? "pattern" : "warning",
@@ -223,6 +242,34 @@ Otherwise, end your turn with your reasoning.`;
 }
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+function derivePaperOutcome(
+  cycleId: string,
+  decision: TradeDecision,
+  latencyMs: number
+): TradeOutcome {
+  const confidenceEdge = Math.max(decision.confidence - config.CONFIDENCE_THRESHOLD, 0);
+  const modeledEdgeBps = Math.max(8, Math.round(confidenceEdge * 120));
+  const slippageBps = Math.min(
+    decision.slippageBps ?? Math.floor(config.MAX_SLIPPAGE_BPS / 2),
+    config.MAX_SLIPPAGE_BPS
+  );
+  const directionBias =
+    decision.action === "sell" || decision.action === "short" || decision.action === "remove_liquidity"
+      ? -1
+      : 1;
+  const pnlUSD = Number(
+    (((decision.sizeUSD * (modeledEdgeBps - slippageBps / 2)) / 10_000) * directionBias).toFixed(2)
+  );
+
+  return {
+    cycleId,
+    pnlUSD,
+    slippageBps,
+    latencyMs,
+    simulated: true,
+  };
+}
 
 bootstrap().catch((err) => {
   console.error("Fatal error:", err);
