@@ -80,13 +80,16 @@ async function runLoop(deps: {
 }): Promise<void> {
   const { tee, signer, attestation, memory, risk, mcpServer, connection } = deps;
   let cycleCount = 0;
+  let shutdownRequested = false;
+  const stopPruneScheduler = startPruneScheduler(memory, config.CYCLE_INTERVAL_MS * 10);
+  const cleanupSignalHandlers = registerShutdownHandlers(() => {
+    shutdownRequested = true;
+  });
 
-  // Prune expired memories every 10 cycles
-  setInterval(() => memory.pruneExpired(), config.CYCLE_INTERVAL_MS * 10);
-
-  while (true) {
-    const cycleId = `cycle-${++cycleCount}-${Date.now()}`;
-    const cycleStart = Date.now();
+  try {
+    while (!shutdownRequested) {
+      const cycleId = `cycle-${++cycleCount}-${Date.now()}`;
+      const cycleStart = Date.now();
 
     log.info("Cycle start", { cycleId, paperTrading: config.PAPER_TRADING });
 
@@ -181,7 +184,7 @@ async function runLoop(deps: {
             timestamp: new Date(),
           });
           log.info("Cycle complete", { cycleId, durationMs: Date.now() - cycleStart });
-          await sleep(config.CYCLE_INTERVAL_MS);
+          await sleepWithShutdown(config.CYCLE_INTERVAL_MS, () => shutdownRequested);
           continue;
         }
 
@@ -216,12 +219,64 @@ async function runLoop(deps: {
       }
 
       log.info("Cycle complete", { cycleId, durationMs: Date.now() - cycleStart });
-    } catch (err) {
-      log.error("Cycle error", { cycleId, error: String(err) });
+      } catch (err) {
+        log.error("Cycle error", { cycleId, error: String(err) });
+      }
+
+      await sleepWithShutdown(config.CYCLE_INTERVAL_MS, () => shutdownRequested);
     }
 
-    await sleep(config.CYCLE_INTERVAL_MS);
+    log.info("Shutdown requested. Agent loop stopped cleanly.");
+  } finally {
+    cleanupSignalHandlers();
+    stopPruneScheduler();
   }
+}
+
+function startPruneScheduler(memory: AgentMemory, intervalMs: number): () => void {
+  let timer: ReturnType<typeof setTimeout> | null = null;
+  let stopped = false;
+
+  const scheduleNext = () => {
+    if (stopped) {
+      return;
+    }
+
+    timer = setTimeout(async () => {
+      try {
+        await memory.pruneExpired();
+      } catch (err) {
+        log.error("Background prune failed", { error: String(err) });
+      } finally {
+        scheduleNext();
+      }
+    }, intervalMs);
+  };
+
+  scheduleNext();
+
+  return () => {
+    stopped = true;
+    if (timer) {
+      clearTimeout(timer);
+      timer = null;
+    }
+  };
+}
+
+function registerShutdownHandlers(onShutdown: () => void): () => void {
+  const handleSignal = (signal: NodeJS.Signals) => {
+    log.warn("Shutdown signal received", { signal });
+    onShutdown();
+  };
+
+  process.once("SIGINT", handleSignal);
+  process.once("SIGTERM", handleSignal);
+
+  return () => {
+    process.off("SIGINT", handleSignal);
+    process.off("SIGTERM", handleSignal);
+  };
 }
 
 function buildSystemPrompt(memoryLines: string[]): string {
@@ -242,6 +297,19 @@ Otherwise, end your turn with your reasoning.`;
 }
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+async function sleepWithShutdown(ms: number, shouldStop: () => boolean): Promise<void> {
+  const deadline = Date.now() + ms;
+
+  while (!shouldStop()) {
+    const remainingMs = deadline - Date.now();
+    if (remainingMs <= 0) {
+      return;
+    }
+
+    await sleep(Math.min(remainingMs, 250));
+  }
+}
 
 function derivePaperOutcome(
   cycleId: string,
