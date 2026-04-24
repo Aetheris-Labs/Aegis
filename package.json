@@ -24,7 +24,7 @@
     "@anthropic-ai/sdk": "^0.54.0",
     "@noble/ed25519": "^3.1.0",
     "@solana/web3.js": "^1.98.0",
-    "chromadb": "^1.9.0",
+    "chromadb": "^3.4.3",
     "zod": "^3.23.0",
     "chalk": "^5.3.0",
     "ora": "^8.1.0",
