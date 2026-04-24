@@ -22,10 +22,13 @@ async function bootstrap(): Promise<void> {
     strategies: config.ACTIVE_STRATEGIES,
   });
 
-  const tee = await TEERuntime.initialize({
+  const teeOptions = {
     mode: config.TEE_MODE,
-    attestationEndpoint: config.ATTESTATION_ENDPOINT,
-  });
+    ...(config.ATTESTATION_ENDPOINT
+      ? { attestationEndpoint: config.ATTESTATION_ENDPOINT }
+      : {}),
+  };
+  const tee = await TEERuntime.initialize(teeOptions);
 
   if (!tee.isHardwareMode && config.REQUIRE_HARDWARE_TEE) {
     throw new Error("Hardware TEE required but not available.");
