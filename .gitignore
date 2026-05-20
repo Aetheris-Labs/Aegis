@@ -51,3 +51,6 @@ chroma-data/
 # Bun
 bun.lockb
 site/
+# Local env overrides
+.env.local
+.env.*.local
