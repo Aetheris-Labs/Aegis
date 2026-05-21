@@ -54,3 +54,6 @@ site/
 # Local env overrides
 .env.local
 .env.*.local
+
+# Vitest cache
+.vitest/
